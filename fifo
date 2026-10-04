@@ -1,0 +1,68 @@
+#include <stdio.h>
+
+int main() {
+    int n, m, i, j, k, avail, page_faults = 0;
+    
+    printf("Enter number of frames (n): ");
+    scanf("%d", &n);
+    
+    printf("Enter number of pages in reference string: ");
+    scanf("%d", &m);
+    
+    int rs[m], frames[n];
+    
+    printf("Enter the page reference string:\n");
+    for(i = 0; i < m; i++) {
+        scanf("%d", &rs[i]);
+    }
+    
+  
+    for(i = 0; i < n; i++) {
+        frames[i] = -1;
+    }
+    
+    int pointer = 0; 
+    
+    printf("\nPage Scheduling Process:\n");
+    for(i = 0; i < m; i++) {
+        avail = 0;
+        
+        // Check if page is already in frames
+        for(j = 0; j < n; j++) {
+            if(frames[j] == rs[i]) {
+                avail = 1;
+                break;
+            }
+        }
+        
+        
+        if(avail == 0) {
+            frames[pointer] = rs[i];
+            pointer = (pointer + 1) % n; // FIFO pointer update
+            page_faults++;
+            
+            
+            printf("Page %2d -> ", rs[i]);
+            for(k = 0; k < n; k++) {
+                if(frames[k] == -1)
+                    printf(" - ");
+                else
+                    printf(" %2d ", frames[k]);
+            }
+            printf(" (Fault)\n");
+        } else {
+            // Page hit
+            printf("Page %2d -> ", rs[i]);
+            for(k = 0; k < n; k++) {
+                if(frames[k] == -1)
+                    printf(" - ");
+                else
+                    printf(" %2d ", frames[k]);
+            }
+            printf(" (Hit)\n");
+        }
+    }
+    
+    printf("\nTotal Number of Page Faults = %d\n", page_faults);
+    return 0;
+}
