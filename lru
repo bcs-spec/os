@@ -1,0 +1,130 @@
+#include <stdio.h>
+int main() 
+{
+    int total_requests, frames_count, page_faults = 0, page_hits = 0;
+
+    printf("--- LRU Page Replacement Algorithm Simulation ---\n\n");
+
+    // 1. Input total number of requests
+    printf("Enter the number of requests: ");
+    if (scanf("%d", &total_requests) != 1 || total_requests <= 0) {
+        printf("Invalid number of requests.\n");
+        return 1;
+    }
+
+    int reference_string[total_requests];
+
+    // 2. Input the reference string array
+    printf("Enter the reference string (separated by spaces): ");
+    for (int i = 0; i < total_requests; i++)
+     {
+        if (scanf("%d", &reference_string[i]) != 1) {
+            printf("Invalid input in reference string.\n");
+            return 1;
+        }
+    }
+
+    // 3. Input number of physical memory frames
+    printf("Enter the number of page frames: ");
+    if (scanf("%d", &frames_count) != 1 || frames_count <= 0) {
+        printf("Invalid number of frames.\n");
+        return 1;
+    }
+
+    int frames[frames_count];
+    int last_used_time[frames_count];
+
+    // Initialize all frames as empty (-1) and track times as 0
+    for (int i = 0; i < frames_count; i++) {
+        frames[i] = -1;
+        last_used_time[i] = 0;
+    }
+
+    printf("\n--- Simulation Matrix ---\n");
+    printf("Req \t [ ");
+    for (int i = 0; i < frames_count; i++) {
+        printf("F%d ", i + 1);
+    }
+    printf("] \t Result\n");
+    printf("-----------------------------------------\n");
+
+    // 4. Core Algorithm Logic
+    for (int i = 0; i < total_requests; i++) {
+        int current_page = reference_string[i];
+        int is_hit = 0;
+        int empty_frame_index = -1;
+
+        // Check if the current page is already present in RAM (Page Hit)
+        for (int j = 0; j < frames_count; j++) {
+            if (frames[j] == current_page) {
+                is_hit = 1;
+                last_used_time[j] = i + 1; // Update counter to denote recent access
+                break;
+            }
+            if (frames[j] == -1 && empty_frame_index == -1) {
+                empty_frame_index = j; // Catalog the first available empty slot
+            }
+        }
+
+        if (is_hit) {
+            page_hits++;
+            printf("%d \t [ ", current_page);
+            for (int j = 0; j < frames_count; j++) {
+                if (frames[j] != -1) printf("%d  ", frames[j]);
+                else printf("-  ");
+            }
+            printf("] \t Page Hit\n");
+        } 
+        else {
+            // Page Fault occurs
+            page_faults++;
+            
+            // If there's an unfilled frame, insert page directly
+            if (empty_frame_index != -1) {
+                frames[empty_frame_index] = current_page;
+                last_used_time[empty_frame_index] = i + 1;
+            } 
+            // If memory is full, find and evict the Least Recently Used (LRU) element
+            else {
+                int lru_index = 0;
+                int minimum_time = last_used_time[0];
+
+                for (int j = 1; j < frames_count; j++) {
+                    if (last_used_time[j] < minimum_time) {
+                        minimum_time = last_used_time[j];
+                        lru_index = j;
+                    }
+                }
+                
+                // Replace the oldest item
+                frames[lru_index] = current_page;
+                last_used_time[lru_index] = i + 1;
+            }
+
+            printf("%d \t [ ", current_page);
+            for (int j = 0; j < frames_count; j++) {
+                if (frames[j] != -1) printf("%d  ", frames[j]);
+                else printf("-  ");
+            }
+            printf("] \t Page Fault\n");
+        }
+    }
+
+    printf("-----------------------------------------\n");
+    printf("Total Page Faults = %d\n", page_faults);
+    printf("Total Page Hits   = %d\n", page_hits);
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
