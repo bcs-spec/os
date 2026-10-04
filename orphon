@@ -1,0 +1,22 @@
+#include<stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+int main()
+{
+pid_t pid= fork();
+if(pid>0)
+{
+printf("\nparent process id= %d",getpid());
+exit(0);
+printf("/n");
+}
+else {
+printf("\nChild Id= %d",getpid());
+sleep(2);
+printf("\nChild Id= %d",getpid());
+printf("\nparentId= %d",getppid());
+}
+return 0;
+}
